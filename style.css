@@ -96,3 +96,19 @@ button:hover {
     color: #777;
     text-align: center;
 }
+
+.task-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+.task-item h3 {
+    margin-top: 0;
+}
+
+.task-item p {
+    margin: 6px 0;
+}
