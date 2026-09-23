@@ -17,7 +17,9 @@ function displayTasks() {
     taskList.innerHTML = "";
 
     if (tasks.length === 0) {
-        taskList.innerHTML = '<p class="empty-message">No tasks added yet.</p>';
+        taskList.innerHTML =
+            '<p class="empty-message">No tasks added yet.</p>';
+
         return;
     }
 
@@ -37,25 +39,62 @@ function displayTasks() {
             </div>
 
             <div class="task-status-control">
+
                 <label for="status-${index}">
                     Update Status
                 </label>
 
-                <select id="status-${index}" class="task-status-select">
-                    <option value="In Progress"
-                        ${task.status === "In Progress" ? "selected" : ""}>
+                <select
+                    id="status-${index}"
+                    class="task-status-select"
+                    data-index="${index}"
+                >
+
+                    <option
+                        value="In Progress"
+                        ${task.status === "In Progress" ? "selected" : ""}
+                    >
                         In Progress
                     </option>
 
-                    <option value="Completed"
-                        ${task.status === "Completed" ? "selected" : ""}>
+                    <option
+                        value="Completed"
+                        ${task.status === "Completed" ? "selected" : ""}
+                    >
                         Completed
                     </option>
+
                 </select>
+
             </div>
         `;
 
         taskList.appendChild(taskItem);
+    });
+
+    addStatusListeners();
+}
+
+// Function to add event listeners to status dropdowns
+function addStatusListeners() {
+
+    const statusSelects =
+        document.querySelectorAll(".task-status-select");
+
+    statusSelects.forEach(function (select) {
+
+        select.addEventListener("change", function () {
+
+            const taskIndex = select.dataset.index;
+
+            const newStatus = select.value;
+
+            tasks[taskIndex].status = newStatus;
+
+            console.log(tasks);
+
+            displayTasks();
+        });
     });
 }
 
@@ -72,7 +111,7 @@ taskForm.addEventListener("submit", function (event) {
         status: statusInput.value
     };
 
-    // Add task object to the tasks array
+    // Add the task object to the tasks array
     tasks.push(newTask);
 
     console.log(tasks);
