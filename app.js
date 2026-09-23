@@ -11,8 +11,31 @@ const deadlineInput = document.getElementById("deadline");
 const statusInput = document.getElementById("status");
 const taskList = document.getElementById("taskList");
 
+// Function to check for overdue tasks
+function checkOverdueTasks() {
+
+    const today = new Date();
+
+    // Set time to midnight so we compare dates only
+    today.setHours(0, 0, 0, 0);
+
+    tasks.forEach(function (task) {
+
+        const deadlineDate = new Date(task.deadline + "T00:00:00");
+
+        if (
+            deadlineDate < today &&
+            task.status !== "Completed"
+        ) {
+            task.status = "Overdue";
+        }
+    });
+}
+
 // Function to display tasks on the page
 function displayTasks() {
+
+    checkOverdueTasks();
 
     taskList.innerHTML = "";
 
@@ -64,6 +87,13 @@ function displayTasks() {
                         Completed
                     </option>
 
+                    <option
+                        value="Overdue"
+                        ${task.status === "Overdue" ? "selected" : ""}
+                    >
+                        Overdue
+                    </option>
+
                 </select>
 
             </div>
@@ -111,12 +141,12 @@ taskForm.addEventListener("submit", function (event) {
         status: statusInput.value
     };
 
-    // Add the task object to the tasks array
+    // Add task object to array
     tasks.push(newTask);
 
     console.log(tasks);
 
-    // Display updated task list
+    // Display updated list
     displayTasks();
 
     // Clear the form
