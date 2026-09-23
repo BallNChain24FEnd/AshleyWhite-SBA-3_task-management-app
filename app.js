@@ -1,6 +1,6 @@
 // Task Management App
 
-// Array that will store all task objects
+// Array that stores all task objects
 let tasks = [];
 
 // Get elements from the page
@@ -21,7 +21,7 @@ function displayTasks() {
         return;
     }
 
-    tasks.forEach(function (task) {
+    tasks.forEach(function (task, index) {
 
         const taskItem = document.createElement("div");
 
@@ -29,9 +29,30 @@ function displayTasks() {
 
         taskItem.innerHTML = `
             <h3>${task.name}</h3>
-            <p><strong>Category:</strong> ${task.category}</p>
-            <p><strong>Deadline:</strong> ${task.deadline}</p>
-            <p><strong>Status:</strong> ${task.status}</p>
+
+            <div class="task-details">
+                <p><strong>Category:</strong> ${task.category}</p>
+                <p><strong>Deadline:</strong> ${task.deadline}</p>
+                <p><strong>Status:</strong> ${task.status}</p>
+            </div>
+
+            <div class="task-status-control">
+                <label for="status-${index}">
+                    Update Status
+                </label>
+
+                <select id="status-${index}" class="task-status-select">
+                    <option value="In Progress"
+                        ${task.status === "In Progress" ? "selected" : ""}>
+                        In Progress
+                    </option>
+
+                    <option value="Completed"
+                        ${task.status === "Completed" ? "selected" : ""}>
+                        Completed
+                    </option>
+                </select>
+            </div>
         `;
 
         taskList.appendChild(taskItem);
@@ -43,7 +64,7 @@ taskForm.addEventListener("submit", function (event) {
 
     event.preventDefault();
 
-    // Create a task object
+    // Create a new task object
     const newTask = {
         name: taskNameInput.value,
         category: categoryInput.value,
@@ -51,12 +72,12 @@ taskForm.addEventListener("submit", function (event) {
         status: statusInput.value
     };
 
-    // Add the object to the tasks array
+    // Add task object to the tasks array
     tasks.push(newTask);
 
     console.log(tasks);
 
-    // Display the updated list
+    // Display updated task list
     displayTasks();
 
     // Clear the form
