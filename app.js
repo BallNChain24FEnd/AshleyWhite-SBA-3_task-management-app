@@ -1,154 +1,114 @@
 // Task Management App
 
-// Array that stores all task objects
-let tasks = [];
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
-// Get elements from the page
 const taskForm = document.getElementById("taskForm");
-const taskNameInput = document.getElementById("taskName");
-const categoryInput = document.getElementById("category");
-const deadlineInput = document.getElementById("deadline");
-const statusInput = document.getElementById("status");
 const taskList = document.getElementById("taskList");
+const statusFilter = document.getElementById("statusFilter");
+const categoryFilter = document.getElementById("categoryFilter");
 
-// Function to check for overdue tasks
-function checkOverdueTasks() {
+function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+}
 
+function checkOverdue() {
     const today = new Date();
-
-    // Set time to midnight so we compare dates only
     today.setHours(0, 0, 0, 0);
 
-    tasks.forEach(function (task) {
+    tasks.forEach(task => {
+        const deadline = new Date(task.deadline + "T00:00:00");
 
-        const deadlineDate = new Date(task.deadline + "T00:00:00");
-
-        if (
-            deadlineDate < today &&
-            task.status !== "Completed"
-        ) {
+        if (deadline < today && task.status !== "Completed") {
             task.status = "Overdue";
         }
     });
+
+    saveTasks();
 }
 
-// Function to display tasks on the page
 function displayTasks() {
+    checkOverdue();
 
-    checkOverdueTasks();
+    const filteredTasks = tasks.filter(task =>
+        (statusFilter.value === "All" || task.status === statusFilter.value) &&
+        (categoryFilter.value === "All" || task.category === categoryFilter.value)
+    );
 
     taskList.innerHTML = "";
 
-    if (tasks.length === 0) {
+    if (filteredTasks.length === 0) {
         taskList.innerHTML =
-            '<p class="empty-message">No tasks added yet.</p>';
-
+            '<p class="empty-message">No matching tasks found.</p>';
         return;
     }
 
-    tasks.forEach(function (task, index) {
+    filteredTasks.forEach(task => {
+        const index = tasks.indexOf(task);
 
-        const taskItem = document.createElement("div");
+        taskList.innerHTML += `
+            <div class="task-item">
+                <h3>${task.name}</h3>
 
-        taskItem.classList.add("task-item");
+                <div class="task-details">
+                    <p><strong>Category:</strong> ${task.category}</p>
+                    <p><strong>Deadline:</strong> ${task.deadline}</p>
+                    <p><strong>Status:</strong> ${task.status}</p>
+                </div>
 
-        taskItem.innerHTML = `
-            <h3>${task.name}</h3>
+                <div class="task-status-control">
+                    <label for="status-${index}">Update Status</label>
 
-            <div class="task-details">
-                <p><strong>Category:</strong> ${task.category}</p>
-                <p><strong>Deadline:</strong> ${task.deadline}</p>
-                <p><strong>Status:</strong> ${task.status}</p>
-            </div>
-
-            <div class="task-status-control">
-
-                <label for="status-${index}">
-                    Update Status
-                </label>
-
-                <select
-                    id="status-${index}"
-                    class="task-status-select"
-                    data-index="${index}"
-                >
-
-                    <option
-                        value="In Progress"
-                        ${task.status === "In Progress" ? "selected" : ""}
+                    <select
+                        id="status-${index}"
+                        class="task-status-select"
+                        data-index="${index}"
                     >
-                        In Progress
-                    </option>
+                        <option value="In Progress"
+                            ${task.status === "In Progress" ? "selected" : ""}>
+                            In Progress
+                        </option>
 
-                    <option
-                        value="Completed"
-                        ${task.status === "Completed" ? "selected" : ""}
-                    >
-                        Completed
-                    </option>
+                        <option value="Completed"
+                            ${task.status === "Completed" ? "selected" : ""}>
+                            Completed
+                        </option>
 
-                    <option
-                        value="Overdue"
-                        ${task.status === "Overdue" ? "selected" : ""}
-                    >
-                        Overdue
-                    </option>
-
-                </select>
-
+                        <option value="Overdue"
+                            ${task.status === "Overdue" ? "selected" : ""}>
+                            Overdue
+                        </option>
+                    </select>
+                </div>
             </div>
         `;
-
-        taskList.appendChild(taskItem);
-    });
-
-    addStatusListeners();
-}
-
-// Function to add event listeners to status dropdowns
-function addStatusListeners() {
-
-    const statusSelects =
-        document.querySelectorAll(".task-status-select");
-
-    statusSelects.forEach(function (select) {
-
-        select.addEventListener("change", function () {
-
-            const taskIndex = select.dataset.index;
-
-            const newStatus = select.value;
-
-            tasks[taskIndex].status = newStatus;
-
-            console.log(tasks);
-
-            displayTasks();
-        });
     });
 }
 
-// Listen for form submission
-taskForm.addEventListener("submit", function (event) {
-
+taskForm.addEventListener("submit", event => {
     event.preventDefault();
 
-    // Create a new task object
-    const newTask = {
-        name: taskNameInput.value,
-        category: categoryInput.value,
-        deadline: deadlineInput.value,
-        status: statusInput.value
-    };
+    tasks.push({
+        name: document.getElementById("taskName").value,
+        category: document.getElementById("category").value,
+        deadline: document.getElementById("deadline").value,
+        status: document.getElementById("status").value
+    });
 
-    // Add task object to array
-    tasks.push(newTask);
-
-    console.log(tasks);
-
-    // Display updated list
+    saveTasks();
     displayTasks();
-
-    // Clear the form
     taskForm.reset();
 });
+
+taskList.addEventListener("change", event => {
+    if (event.target.classList.contains("task-status-select")) {
+        tasks[event.target.dataset.index].status = event.target.value;
+
+        saveTasks();
+        displayTasks();
+    }
+});
+
+statusFilter.addEventListener("change", displayTasks);
+categoryFilter.addEventListener("change", displayTasks);
+
+displayTasks();
