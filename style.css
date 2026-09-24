@@ -32,6 +32,7 @@ body {
     padding: 20px;
     margin-bottom: 25px;
     border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .task-form-section h2,
@@ -63,6 +64,11 @@ select {
     border-radius: 6px;
 }
 
+input:focus,
+select:focus {
+    outline: 2px solid #555;
+}
+
 button {
     padding: 12px;
     font-size: 16px;
@@ -75,6 +81,14 @@ button {
 
 button:hover {
     background-color: #555;
+}
+
+.feedback {
+    color: #2f6b3b;
+    font-weight: bold;
+    text-align: center;
+    min-height: 20px;
+    margin: 0;
 }
 
 .filter-controls {
@@ -131,4 +145,15 @@ button:hover {
 
 .task-status-control select {
     width: 100%;
+}
+
+@media (max-width: 600px) {
+    .container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+
+    .filter-controls {
+        flex-direction: column;
+    }
 }

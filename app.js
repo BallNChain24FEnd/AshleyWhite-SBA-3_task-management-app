@@ -6,6 +6,7 @@ const taskForm = document.getElementById("taskForm");
 const taskList = document.getElementById("taskList");
 const statusFilter = document.getElementById("statusFilter");
 const categoryFilter = document.getElementById("categoryFilter");
+const feedback = document.getElementById("feedback");
 
 function saveTasks() {
     localStorage.setItem("tasks", JSON.stringify(tasks));
@@ -97,6 +98,8 @@ taskForm.addEventListener("submit", event => {
     saveTasks();
     displayTasks();
     taskForm.reset();
+
+    feedback.textContent = "Task added successfully!";
 });
 
 taskList.addEventListener("change", event => {
@@ -105,6 +108,8 @@ taskList.addEventListener("change", event => {
 
         saveTasks();
         displayTasks();
+
+        feedback.textContent = "Task status updated!";
     }
 });
 
